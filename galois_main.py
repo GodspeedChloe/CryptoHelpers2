@@ -2,7 +2,7 @@
 	File: galois_main.py
 	Description:	Functions for doing Galois Field crypto/number theory
 	Author:	Chloe Jackson
-	Version: 30-Dec-2018
+	Version: 31-Dec-2018
 '''
 
 #imports
@@ -186,20 +186,47 @@ def addition_table(base,exp,N):
 	Display a table neatly
 
 	@param	table	2D array of polynomials
+	@param	exp		field exponent
 	@param	N		(base^exp)
 '''
-def display_table(table,N):
+def display_table(table,exp,N):
 	for i in range(0,N):
 		line = ''
 		for j in range(0,N):
 			v = table[i*N+j]
-			v = v[:3]
+			v = v[:exp]
 			v.reverse()
 			r = ''
 			for c in v:
 				r = r + str(c)
 			line = line + '  ' + r
 		print line
+
+
+'''
+	Display a polynomial given its coefficients
+	
+	@param	poly	a list of coefficients
+'''
+def display_poly(poly):
+	n = len(poly) - 1
+	k = n
+	string = ''
+	for i in range(0,n):
+		if poly[i] > 1:
+			string += str(poly[i])
+		elif poly[i] == 0:
+			k -= 1
+			continue
+		if k == 1:
+			string += 'x + '
+			k -= 1
+			continue
+		string += 'x^' + str(k) + ' + '
+		k -= 1
+
+	return string + str(poly[n])
+	
 
 
 '''
@@ -212,8 +239,9 @@ def main():
 
 	print "Enter the polynomial coefficients including quotation marks."
 	print "Ex.  2x^6 + x^2 + 2  is \"2 0 0 0 1 0 2\""
-	poly = input("poly: ").split(" ")
+	poly = input("\npoly: ").split(" ")
 	poly = map(int, poly)
+	print "Your modulus: ", display_poly(poly)
 	poly.reverse()
 
 	if len(poly) != (degree + 1):
@@ -222,19 +250,19 @@ def main():
 
 	N = pow(f_base,f_exp)
 	
-	c = raw_input("Do you wish to display the addition and multiplication tables (Y/n)?: ")
+	c = raw_input("\nDo you wish to display the addition and multiplication tables (Y/n)?: ")
 
 	# generate addition table
-	print "\nAddition table for GF(",N,")"
 	a_table = addition_table(f_base,f_exp,N)
 	if c == "Y":
-		display_table(a_table,N)
+		print '\nAddition table for GF(',N,')'
+		display_table(a_table,f_exp,N)
 
 	# generate multiplication table	
-	print "\nMultiplication table for GF(",N,")"
 	m_table = multiplication_table(f_base,f_exp,poly,N)
 	if c == "Y":
-		display_table(m_table,N)
+		print '\nMultiplication table for GF(',N,')'
+		display_table(m_table,f_exp,N)
 
 
 
