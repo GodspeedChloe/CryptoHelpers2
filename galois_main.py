@@ -222,15 +222,20 @@ def main():
 
 	N = pow(f_base,f_exp)
 	
+	c = raw_input("Do you wish to display the addition and multiplication tables (Y/n)?: ")
+
 	# generate addition table
 	print "\nAddition table for GF(",N,")"
-	table = addition_table(f_base,f_exp,N)
-	display_table(table,N)
+	a_table = addition_table(f_base,f_exp,N)
+	if c == "Y":
+		display_table(a_table,N)
 
 	# generate multiplication table	
 	print "\nMultiplication table for GF(",N,")"
-	table = multiplication_table(f_base,f_exp,poly,N)
-	display_table(table,N)
+	m_table = multiplication_table(f_base,f_exp,poly,N)
+	if c == "Y":
+		display_table(m_table,N)
+
 
 
 main()
