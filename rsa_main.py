@@ -4,11 +4,13 @@ Author:	Chloe Jackson
 Description:	RSA helpers for students
 """
 
+#import
 import fileinput
 import time			# and then there was another dimension
 from eea import * 
 from sq_mul import *
 from math import *
+#/import
 
 
 # Greet and meet

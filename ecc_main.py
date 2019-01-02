@@ -5,9 +5,10 @@ Description:	Suite of elliptic curve cryptographic applications for students
 				to use and learn from
 """
 
+#import
 import sys
 import	fileinput
-import	time					# and then there was another dimension
+import	time	
 from math import *
 from eea import *
 from random import *
@@ -15,6 +16,7 @@ from random import *
 # import for graphing
 import numpy as np
 import matplotlib.pyplot as plt
+#/import
 
 
 '''

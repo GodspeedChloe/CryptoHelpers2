@@ -189,12 +189,15 @@ def addition_table(base,exp,N):
 	@param	exp		field exponent
 	@param	N		(base^exp)
 '''
-def display_table(table,exp,N):
+def display_table(table,exp,N,opt):
 	for i in range(0,N):
 		line = ''
 		for j in range(0,N):
 			v = table[i*N+j]
 			v = v[:exp]
+			if opt == 'Y':
+				line = line + '  ' + display_poly(v)
+				continue
 			v.reverse()
 			r = ''
 			for c in v:
@@ -219,13 +222,15 @@ def display_poly(poly):
 			k -= 1
 			continue
 		if k == 1:
-			string += 'x + '
+			string += 'x+'
 			k -= 1
 			continue
-		string += 'x^' + str(k) + ' + '
+		string += 'x^' + str(k) + '+'
 		k -= 1
 
-	return string + str(poly[n])
+	if poly[n] != 0 or len(string) == 0:
+		return string + str(poly[n])
+	return string[:len(string) - 3]
 	
 
 
@@ -252,17 +257,16 @@ def main():
 	
 	c = raw_input("\nDo you wish to display the addition and multiplication tables (Y/n)?: ")
 
-	# generate addition table
+	# generate tables
+	m_table = multiplication_table(f_base,f_exp,poly,N)
 	a_table = addition_table(f_base,f_exp,N)
 	if c == "Y":
+		opt = raw_input("Would you like pretty print (Y/n)? ")	
 		print '\nAddition table for GF(',N,')'
-		display_table(a_table,f_exp,N)
+		display_table(a_table,f_exp,N,opt)
 
-	# generate multiplication table	
-	m_table = multiplication_table(f_base,f_exp,poly,N)
-	if c == "Y":
 		print '\nMultiplication table for GF(',N,')'
-		display_table(m_table,f_exp,N)
+		display_table(m_table,f_exp,N,opt)
 
 
 
