@@ -2,13 +2,22 @@
 	File: galois_main.py
 	Description:	Functions for doing Galois Field crypto/number theory
 	Author:	Chloe Jackson
-	Version: 31-Dec-2018
+	Version: 11-Jan-2019
 '''
 
 #imports
 
 
 #/imports
+
+
+'''
+	Print a welcome message
+'''
+def welcome():
+	print "****    CRYPTO HELPER: GALOIS FIELD    ****"
+
+
 
 '''
 	Recursively increase a polynomial
@@ -33,23 +42,92 @@ def inc_poly(t,k,base):
 	@param	base	base for coefficients
 '''
 def multiply(t1,t2,base):
-	if len(t1) < len(t2):
-		r = t2
-		t2 = t1
-		t1 = r
 
 	n = len(t2)
-	r = [0] * (2*n)
-	for i in range(0,n):
+	m = len(t1)
+	r = [0] * (2*max(n,m))
+	for i in range(0,m):
 		c1 = t1[i]
 		for j in range(0,n):
 			c2 = t2[j]
 			q = c1 * c2
 			q %= base
 			r[i + j] = r[i+j] + q
+			r[i + j] %= base
 	return r
 
 
+
+'''
+	Divide two polynomials and return quotient, remainder
+
+	@param	t1		numerator
+	@param	t2		denominator
+	@param	base	base for coefficients
+'''
+def divide(t1,t2,base):
+	quotient = []
+	while True:
+		n = get_degree(t1)
+		m = get_degree(t2)
+	
+		local_quotient = [0] * (n + 2)
+		local_quotient[n-m] = 1
+		quotient = add(quotient,local_quotient,base)
+		remainder = multiply(local_quotient,t2,base)
+		remainder = trim(remainder)
+		remainder = subtract(t1,remainder,base)
+		if get_degree(remainder) < get_degree(t2):
+			break
+		t1 = remainder
+	return trim(quotient), remainder
+	
+	
+'''
+	Get the degree of a polynomials
+
+	@param	t		polynomial
+'''
+def get_degree(t):
+	k = len(t) - 1
+	while k >= 0:
+		if t[k] != 0:
+			return k
+		k -= 1
+	return -1
+
+
+'''
+	Divide two polynomials and get inverse
+	
+	@param	px		modulus
+	@param	fx		polynomial in ring
+	@param	base	base for coefficients
+'''
+def inverse(px,fx,base):
+
+	qs = []
+	r1 = px
+	r2 = fx
+	remainder = [1]
+	while True:
+		quotient, remainder = divide(trim(r1),trim(r2),base)
+		qs += [quotient]
+		r1 = r2
+		r2 = remainder
+		if trim(remainder) == []:
+			break
+	t1 = [0]
+	t2 = [1]
+	t = []
+	# using t = t1 - (q * t2)
+	for i in range(0,len(qs)-1):
+		temp = multiply_mod(qs[i],t2,base,px)
+		t = subtract(t1,temp,base)
+		t1 = t2
+		t2 = t
+	return t2
+	
 '''
 	Add two polynomials together
 
@@ -76,6 +154,47 @@ def add(t1,t2,base):
 		r[i] = t1[i]
 		i += 1
 
+	return r
+
+
+'''
+	Trim trailing zeroes
+
+	@param	t		polynomial
+'''
+def trim(t):
+	k = len(t) - 1
+	while k >= 0:
+		if t[k] != 0:
+			break
+		k -= 1
+
+	return t[:k+1]
+
+
+'''
+	Subtract two polynomials together
+
+	@param	t1		polynomial 1
+	@param	t2		polynomial 2
+	@param	base	base for coefficients
+'''
+def subtract(t1,t2,base):
+
+
+	r = []
+	i = 0
+	while i < min(len(t2),len(t1)):
+		c = t1[i] + (base - t2[i])
+		c = c % base
+		r += [c]
+		i += 1
+
+	if len(t2) != len(t1):
+		if len(t2) > len(t1):
+			r += t2[i:]
+		else:
+			r += t1[i:]
 	return r
 
 	
@@ -119,7 +238,7 @@ def multiply_mod(t1,t2,base,mod):
 		r = add(temp,r[:k],base)
 		k = is_reduced(r,n)
 
-	return r
+	return trim(r)
 
 
 '''
@@ -218,10 +337,11 @@ def display_poly(poly):
 	for i in range(0,n):
 		if poly[i] > 1:
 			string += str(poly[i])
+			k -= 1
 		elif poly[i] == 0:
 			k -= 1
 			continue
-		if k == 1:
+		if k == 0:
 			string += 'x+'
 			k -= 1
 			continue
@@ -233,12 +353,12 @@ def display_poly(poly):
 	return string[:len(string) - 3]
 	
 
-
 '''
 	Compute the values in a field and print them
 '''
 def main():
-	f_base = input("Enter the field base i.e. GF(base^exponent): ")
+	welcome()
+	f_base = input("\nEnter the field base i.e. GF(base^exponent): ")
 	f_exp = input("Enter the field exponent now: ")
 	degree = input("Enter the degree of the modulus polynomial: ")
 
@@ -268,6 +388,21 @@ def main():
 		print '\nMultiplication table for GF(',N,')'
 		display_table(m_table,f_exp,N,opt)
 
+	# get option
+	print "For finding a polynomial's inverse, enter 1."
+	opt = input()
 
+
+	if opt == 1:
+		t = input("\npolynomial to find inverse for: ").split(" ")
+		t = map(int,t)
+		t.reverse()
+		inv = [0]
+		if trim(t) == []:
+			print "0 has no multiplicative inverse ever."
+			return
+		inv = inverse(poly,t,f_base)
+		inv.reverse()
+		print "Your inverse: ", display_poly(inv)	
 
 main()
