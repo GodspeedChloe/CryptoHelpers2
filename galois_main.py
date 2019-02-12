@@ -7,6 +7,7 @@
 
 #imports
 
+import eea 
 
 #/imports
 
@@ -72,6 +73,18 @@ def divide(t1,t2,base):
 		m = get_degree(t2)
 	
 		local_quotient = [0] * (n + 2)
+	
+
+		'''	
+		# determine what factor should be multiplied as the coefficient
+		c_n = t1[n] # coefficient of numerator largest term
+		c_m = t2[m] # coefficient of divisor largest term
+		inv = 1.0 * c_n / c_m
+		if round(inv) != inv:
+			# multiply numerator by discrete inverse of divisor
+			inv = c_n * eea.inverse(c_m, base)
+			inv %= base
+		'''
 		local_quotient[n-m] = 1
 		quotient = add(quotient,local_quotient,base)
 		remainder = multiply(local_quotient,t2,base)
@@ -127,6 +140,7 @@ def inverse(px,fx,base):
 		t1 = t2
 		t2 = t
 	return t2
+
 	
 '''
 	Add two polynomials together
@@ -238,7 +252,7 @@ def multiply_mod(t1,t2,base,mod):
 		r = add(temp,r[:k],base)
 		k = is_reduced(r,n)
 
-	return trim(r)
+	return r
 
 
 '''
@@ -332,25 +346,22 @@ def display_table(table,exp,N,opt):
 '''
 def display_poly(poly):
 	n = len(poly) - 1
-	k = n
+	k = n + 1
 	string = ''
 	for i in range(0,n):
+		k -= 1
 		if poly[i] > 1:
 			string += str(poly[i])
-			k -= 1
 		elif poly[i] == 0:
-			k -= 1
 			continue
-		if k == 0:
+		if k == 1:
 			string += 'x+'
-			k -= 1
 			continue
 		string += 'x^' + str(k) + '+'
-		k -= 1
 
 	if poly[n] != 0 or len(string) == 0:
 		return string + str(poly[n])
-	return string[:len(string) - 3]
+	return string[:len(string) - 1]
 	
 
 '''
@@ -388,21 +399,25 @@ def main():
 		print '\nMultiplication table for GF(',N,')'
 		display_table(m_table,f_exp,N,opt)
 
-	# get option
-	print "For finding a polynomial's inverse, enter 1."
-	opt = input()
+
+	while True:
+		print '\n'
+		# get option
+		opt = input("For finding a polynomial's inverse, enter 1: ")
 
 
-	if opt == 1:
-		t = input("\npolynomial to find inverse for: ").split(" ")
-		t = map(int,t)
-		t.reverse()
-		inv = [0]
-		if trim(t) == []:
-			print "0 has no multiplicative inverse ever."
-			return
-		inv = inverse(poly,t,f_base)
-		inv.reverse()
-		print "Your inverse: ", display_poly(inv)	
+		if opt == 1:
+			t = input("\npolynomial to find inverse for: ").split(" ")
+			print "Thinking......."
+			t = map(int,t)
+			t.reverse()
+			inv = [0]
+			if trim(t) == []:
+				print "0 has no multiplicative inverse ever."
+				continue
+			inv = inverse(poly,t,f_base)
+			inv = trim(inv)
+			inv.reverse()
+			print "Your inverse: ", display_poly(inv)	
 
 main()
