@@ -16,7 +16,8 @@ import eea
 	Print a welcome message
 '''
 def welcome():
-	print "****    CRYPTO HELPER: GALOIS FIELD    ****"
+	print "\n****    CRYPTO HELPER: GALOIS FIELD    ****"
+	print "****       AUTHOR: CHLOE JACKSON       ****"
 
 
 
@@ -75,7 +76,6 @@ def divide(t1,t2,base):
 		local_quotient = [0] * (n + 2)
 	
 
-		'''	
 		# determine what factor should be multiplied as the coefficient
 		c_n = t1[n] # coefficient of numerator largest term
 		c_m = t2[m] # coefficient of divisor largest term
@@ -84,8 +84,8 @@ def divide(t1,t2,base):
 			# multiply numerator by discrete inverse of divisor
 			inv = c_n * eea.inverse(c_m, base)
 			inv %= base
-		'''
-		local_quotient[n-m] = 1
+		
+		local_quotient[n-m] = inv
 		quotient = add(quotient,local_quotient,base)
 		remainder = multiply(local_quotient,t2,base)
 		remainder = trim(remainder)
@@ -374,7 +374,7 @@ def main():
 	degree = input("Enter the degree of the modulus polynomial: ")
 
 	print "Enter the polynomial coefficients including quotation marks."
-	print "Ex.  2x^6 + x^2 + 2  is \"2 0 0 0 1 0 2\""
+	print "Ex.  2x^3 + x + 3  is \"2 0 1 3\""
 	poly = input("\npoly: ").split(" ")
 	poly = map(int, poly)
 	print "Your modulus: ", display_poly(poly)
@@ -402,11 +402,16 @@ def main():
 
 	while True:
 		print '\n'
+
 		# get option
-		opt = input("For finding a polynomial's inverse, enter 1: ")
+		print 'Enter 0 to quit'
+		print 'Enter 1 for polynomial inverse computation'
+		opt = input("option -> : ")
 
+		if opt == 0:
+			return
 
-		if opt == 1:
+		elif opt == 1:
 			t = input("\npolynomial to find inverse for: ").split(" ")
 			print "Thinking......."
 			t = map(int,t)
@@ -420,4 +425,5 @@ def main():
 			inv.reverse()
 			print "Your inverse: ", display_poly(inv)	
 
-main()
+if __name__ == "__main__":
+	main()
